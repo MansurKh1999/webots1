@@ -139,15 +139,16 @@ void wbu_car_init() {
   char engine_type;
   int engine_sound_length;
   char *sub_data_string = (char *)wb_robot_get_custom_data();
-  i = sscanf(sub_data_string, "%lf %lf %lf %lf %lf %lf %lf %c %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %d %d",
+  i = sscanf(sub_data_string, "%lf %lf %lf %lf %lf %lf %lf %lf %c %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %d %d",
              &instance->wheelbase, &instance->track_front, &instance->track_rear, &instance->front_wheel_radius,
-             &instance->rear_wheel_radius, &instance->brake_coefficient, &instance->defaultDampingConstant, &engine_type,
-             &instance->engine_max_torque, &instance->engine_max_power, &instance->engine_min_rpm, &instance->engine_max_rpm,
-             &instance->engine_coefficients[0], &instance->engine_coefficients[1], &instance->engine_coefficients[2],
-             &instance->hybrid_power_split_ratio, &instance->hybrid_power_split_rpm, &instance->engine_sound_rpm_reference,
-             &instance->gear_number, &engine_sound_length);
+             &instance->rear_wheel_radius, &instance->brake_coefficient, &instance->defaultSpringConstant,
+             &instance->defaultDampingConstant, &engine_type, &instance->engine_max_torque, &instance->engine_max_power,
+             &instance->engine_min_rpm, &instance->engine_max_rpm, &instance->engine_coefficients[0],
+             &instance->engine_coefficients[1], &instance->engine_coefficients[2], &instance->hybrid_power_split_ratio,
+             &instance->hybrid_power_split_rpm, &instance->engine_sound_rpm_reference, &instance->gear_number,
+             &engine_sound_length);
 
-  if (i < 20) {
+  if (i < 21) {
     fprintf(stderr, "Error: Only nodes based on the 'Car' node can used the car library.\n");
     exit(-1);
   }
@@ -165,7 +166,7 @@ void wbu_car_init() {
   // Extract the gear ratio from the rest of the string (variable size)
   instance->gear_ratio = (double *)malloc(instance->gear_number * sizeof(double));
   // skip first twenty parameters (beginning of the string already parsed)
-  for (i = 0; i < 20; ++i)
+  for (i = 0; i < 21; ++i)
     sub_data_string = strchr(sub_data_string, ' ') + 1;
   // get all the gear ratio
   for (i = 0; i < instance->gear_number; ++i) {

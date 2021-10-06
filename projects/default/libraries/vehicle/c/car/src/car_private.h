@@ -65,6 +65,7 @@ typedef struct {
   double front_wheel_radius;
   double rear_wheel_radius;
   double brake_coefficient;
+  double defaultSpringConstant;
   double defaultDampingConstant;
   char *engine_sound;
   double engine_sound_rpm_reference;
