@@ -24,6 +24,14 @@
 #include "WbWorld.hpp"
 #include "WbWrenRenderingContext.hpp"
 
+#include <wren/config.h>
+#include <wren/node.h>
+#include <wren/renderable.h>
+#include <wren/static_mesh.h>
+#include <wren/transform.h>
+
+#include <ode/ode.h>
+
 #include <cassert>
 
 // Constructors
@@ -400,6 +408,12 @@ void WbHingeJoint::updatePosition(double position) {
   }
 }
 
+WbVector3 WbHingeJoint::suspensionAxis() const {
+  static const WbVector3 DEFAULT_AXIS(1.0, 0.0, 0.0);
+  const WbHingeJointParameters *const p = hingeJointParameters();
+  return p ? p->suspensionAxis() : DEFAULT_AXIS;
+}
+
 // Updates
 
 void WbHingeJoint::updateParameters() {
@@ -416,6 +430,8 @@ void WbHingeJoint::updateParameters() {
 void WbHingeJoint::updateSuspension() {
   if (isEnabled())
     applyToOdeSuspension();
+  if (WbWrenRenderingContext::instance()->isOptionalRenderingEnabled(WbWrenRenderingContext::VF_JOINT_AXES))
+    updateJointAxisRepresentation();
 }
 
 void WbHingeJoint::updateMinAndMaxStop(double min, double max) {
@@ -489,4 +505,28 @@ void WbHingeJoint::updateOdeWorldCoordinates() {
   applyToOdeAnchor();
   if (p)
     applyToOdeSuspensionAxis();
+}
+
+void WbHingeJoint::updateJointAxisRepresentation() {
+  WbJoint::updateJointAxisRepresentation();
+
+  if (!areWrenObjectsInitialized())
+    return;
+
+  wr_static_mesh_delete(mMeshSuspension);
+
+  const double scaling = 0.5f * wr_config_get_line_scale();
+
+  const WbVector3 &anchorVector = anchor();
+
+  const WbVector3 &suspensionAxisVector = scaling * suspensionAxis();
+  WbVector3 suspensionVertex(anchorVector - suspensionAxisVector);
+  float suspensionVertices[6];
+  suspensionVertex.toFloatArray(suspensionVertices);
+
+  suspensionVertex = anchorVector + suspensionAxisVector;
+  suspensionVertex.toFloatArray(suspensionVertices + 3);
+
+  mMeshSuspension = wr_static_mesh_line_set_new(2, suspensionVertices, NULL);
+  wr_renderable_set_mesh(mRenderableSuspension, WR_MESH(mMeshSuspension));
 }

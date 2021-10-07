@@ -108,9 +108,13 @@ protected:
   bool mIsEndPointPositionChangedByJoint;
 
   WrTransform *mTransform;
+  WrTransform *mTransformSuspension;
   WrRenderable *mRenderable;
   WrStaticMesh *mMesh;
+  WrStaticMesh *mMeshSuspension;
+  WrRenderable *mRenderableSuspension;
   WrMaterial *mMaterial;
+  WrMaterial *mMaterialSuspension;
 
   const bool isJoint() const override { return true; }
 
