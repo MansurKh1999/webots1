@@ -260,7 +260,7 @@ static void compute_rpm() {
 }
 
 static void update_slip_ratio() {
-  if (instance->car->type == WBU_CAR_TRACTION) {
+  if (instance->car->type == WBU_CAR_TRACTION || instance->car->type == WBU_CAR_FOUR_BY_FOUR) {
     // Compute and update the front slip differential ratio (between -1 and 1)
     double real_front_ratio = (instance->car->speeds[0] / (instance->car->speeds[0] + instance->car->speeds[1])) * 2 - 1;
     // for better result a PD controller can be used here
@@ -272,7 +272,7 @@ static void update_slip_ratio() {
     else if (instance->front_slip_ratio > 1)
       instance->front_slip_ratio = 1;
   }
-  if (instance->car->type == WBU_CAR_PROPULSION) {
+  if (instance->car->type == WBU_CAR_PROPULSION || instance->car->type == WBU_CAR_FOUR_BY_FOUR) {
     // Compute and update the rear slip differential ratio (between -1 and 1)
     double real_rear_ratio = (instance->car->speeds[2] / (instance->car->speeds[2] + instance->car->speeds[3])) * 2 - 1;
     // for better result a PD controller can be used here
