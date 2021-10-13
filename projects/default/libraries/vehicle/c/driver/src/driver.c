@@ -160,7 +160,7 @@ static double compute_output_torque() {
     double temporary_engine_torque = (instance->car->engine_max_power * 60) / (2 * M_PI * real_rpm);
     if (temporary_engine_torque > instance->car->engine_max_torque)
       temporary_engine_torque = instance->car->engine_max_torque;
-    fprintf(stdout, ">>>%f\n", temporary_engine_torque);
+    // fprintf(stdout, ">>>%f\n", temporary_engine_torque);
     engine_torque += temporary_engine_torque;
   }
 
@@ -173,7 +173,6 @@ static double compute_output_torque() {
   // do not touch the ground)
   if (fabs(instance->car->max_acceleration) > ACCELERATION_THRESHOLD)
     output_torque *= (ACCELERATION_THRESHOLD / fabs(instance->car->max_acceleration));
-
   return output_torque;
 }
 
@@ -204,6 +203,7 @@ static void update_wheels_speed(int ms) {  // Warning speed is wrong the first t
     const double acceleration = (instance->car->speeds[i] - previous_speed[i]) / ms;
     if (fabs(acceleration) > fabs(instance->car->max_acceleration))
       instance->car->max_acceleration = acceleration;
+
     previous_position[i] = current_position[i];
     previous_speed[i] = instance->car->speeds[i];
   }
@@ -302,7 +302,6 @@ static void update_slip_ratio() {
 
 static void update_torque() {
   double torque = compute_output_torque();
-
   // Distribute the available torque to the actuated wheels using 'geometric' differential rules
   if (instance->car->type == WBU_CAR_TRACTION) {
     // Geometric differential ratio (left and right wheel should not have same torque because the rotation radius is not the
@@ -317,7 +316,7 @@ static void update_torque() {
     double left_torque = torque * (1 - ratio);
     wb_motor_set_torque(instance->car->wheels[0], right_torque);
     wb_motor_set_torque(instance->car->wheels[1], left_torque);
-    fprintf(stdout, "Traction %f, output: %f\n%f %f\n%f %f\n", ratio, torque, left_torque, right_torque, 0.0, 0.0);
+    // fprintf(stdout, "Traction %f, output: %f\n%f %f\n%f %f\n", ratio, torque, left_torque, right_torque, 0.0, 0.0);
   } else if (instance->car->type == WBU_CAR_PROPULSION) {
     // Geometric differential ratio (left and right wheel should not have same torque because the rotation radius is not the
     // same)
@@ -331,7 +330,7 @@ static void update_torque() {
     double left_torque = torque * (1 - ratio);
     wb_motor_set_torque(instance->car->wheels[2], right_torque);
     wb_motor_set_torque(instance->car->wheels[3], left_torque);
-    fprintf(stdout, "Propulsion %f, output: %f\n%f %f\n%f %f\n", ratio, torque, left_torque, right_torque, 0.0, 0.0);
+    // fprintf(stdout, "Propulsion %f, output: %f\n%f %f\n%f %f\n", ratio, torque, left_torque, right_torque, 0.0, 0.0);
   } else if (instance->car->type == WBU_CAR_FOUR_BY_FOUR) {
     // Geometric differential ratio
     double ratio_front = differential_ratio_front();
@@ -345,7 +344,7 @@ static void update_torque() {
       ratio_central *= 2 * (1 - ((instance->central_slip_ratio + 1) / 2));
     }
 
-    fprintf(stdout, "<%f %f %f>\n", instance->front_slip_ratio, instance->rear_slip_ratio, instance->central_slip_ratio);
+    // fprintf(stdout, "<%f %f %f>\n", instance->front_slip_ratio, instance->rear_slip_ratio, instance->central_slip_ratio);
 
     // Compute and apply torques
     double front_right_torque = torque * ratio_front * ratio_central;
@@ -356,8 +355,8 @@ static void update_torque() {
     wb_motor_set_torque(instance->car->wheels[1], front_left_torque);
     wb_motor_set_torque(instance->car->wheels[2], rear_right_torque);
     wb_motor_set_torque(instance->car->wheels[3], rear_left_torque);
-    fprintf(stdout, "4x4 RF %f RR %f RC %f output %f\n%f %f\n%f %f\n", ratio_front, ratio_rear, ratio_central, torque,
-            front_left_torque, front_right_torque, rear_left_torque, rear_right_torque);
+    // fprintf(stdout, "4x4 RF %f RR %f RC %f output %f\n%f %f\n%f %f\n", ratio_front, ratio_rear, ratio_central, torque,
+    //        front_left_torque, front_right_torque, rear_left_torque, rear_right_torque);
   }
 }
 
