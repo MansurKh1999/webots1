@@ -709,5 +709,5 @@ Robot {
   ]
   name "Driver"
   controller "driver"
-  supervisor TRUE
+  supervisor FALSE
 }
